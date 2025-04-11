@@ -1,0 +1,43 @@
+/* NavbarStyles.css */
+.create-account-button {
+    display: inline-block; /* Make it behave like a block-level element but inline */
+    background-color: #007bff; /* Example button background color */
+    color: white; /* Example button text color */
+    border: none; /* Remove default link border */
+    border-radius: 5px; /* Add rounded corners */
+    text-decoration: none; /* Remove default link underline */
+    cursor: pointer; /* Change cursor to indicate it's clickable */
+    
+    transition: box-shadow 0.3s ease; /* Add transition for smooth glow effect */
+    font-size: 0.9em;
+  }
+
+  .create-account-button:hover {
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.7); /* Add a subtle glow on hover */
+  }
+  
+  .create-account-button:focus {
+    outline: none; /* Remove default focus outline for a custom one if needed */
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.7); /* Apply glow on focus as well */
+  }
+
+  .login-account-button {
+    display: inline-block; /* Make it behave like a block-level element but inline */
+    background-color: #156c03; /* Example button background color */
+    color: white; /* Example button text color */
+    border: none; /* Remove default link border */
+    border-radius: 5px; /* Add rounded corners */
+    text-decoration: none; /* Remove default link underline */
+    cursor: pointer; /* Change cursor to indicate it's clickable */
+    
+    transition: box-shadow 0.3s ease; /* Add transition for smooth glow effect */
+    font-size: 0.9em;
+  }
+  .login-account-button:hover {
+    box-shadow: 0 0 10px rgba(31, 188, 0, 0.808); /* Add a subtle glow on hover */
+  }
+  
+  .login-account-button:focus {
+    outline: none; /* Remove default focus outline for a custom one if needed */
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.7); /* Apply glow on focus as well */
+  }

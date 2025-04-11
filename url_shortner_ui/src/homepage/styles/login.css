@@ -1,0 +1,11 @@
+.login-footer { /* Add a class to your footer element in the Login component */
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: #f8f9fa; /* Example background color */
+    color: #495057; /* Example text color */
+    text-align: center;
+    padding: 10px 0; /* Example padding */
+    z-index: 1000; /* Ensure it's above other content if needed */
+  }

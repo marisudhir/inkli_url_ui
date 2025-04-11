@@ -1,0 +1,25 @@
+html, body, #root {
+    height: 100%; /* Make sure these elements take up the full viewport height */
+  }
+  
+  body {
+    display: flex;
+    flex-direction: column; /* Arrange body content in a column */
+  }
+  
+  main {
+    flex-grow: 1; /* Make the main content area take up any available vertical space */
+  }
+  
+  footer {
+    
+    background-color: #f5bd05; 
+    padding: 20px;
+    text-align: left;
+    position: relative;
+    left: 0;
+    bottom: 0;
+    /* min-height: calc(100vh - 34px); */
+
+  }
+
