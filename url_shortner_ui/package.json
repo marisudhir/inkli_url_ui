@@ -17,6 +17,7 @@
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.8.4",
     "bootstrap": "^5.3.5",
+    "date-fns": "^4.1.0",
     "font-awesome": "^4.7.0",
     "froala-editor": "^4.5.1",
     "react": "^18.2.0",

@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import LoginHeader from './loginheader'; // Adjust path as needed
 import Footer from '../footer';
+
 const Profile = () => {
     const navigate = useNavigate();
     const [userData, setUserData] = useState(null);
@@ -36,7 +37,8 @@ const Profile = () => {
 
                 if (response.ok) {
                     const data = await response.json();
-                    setUserData(data);
+                    console.log("API Response in Frontend:", data); // Log the response
+                    setUserData(data); // The entire response object
                     setLoading(false);
                 } else if (response.status === 401) {
                     setError('Unauthorized. Please log in again.');
@@ -76,11 +78,11 @@ const Profile = () => {
                         <CircularProgress />
                     ) : error ? (
                         <Alert severity="error">{error}</Alert>
-                    ) : userData ? (
+                    ) : userData?.user ? ( // Access the 'user' property
                         <>
                             <TextField
                                 label="ID"
-                                value={userData.id || 'N/A'}
+                                value={userData.user.id || 'N/A'}
                                 InputProps={{
                                     readOnly: true,
                                 }}
@@ -89,7 +91,7 @@ const Profile = () => {
                             />
                             <TextField
                                 label="Username"
-                                value={userData.username || 'N/A'}
+                                value={userData.user.username || 'N/A'}
                                 InputProps={{
                                     readOnly: true,
                                 }}
@@ -98,7 +100,7 @@ const Profile = () => {
                             />
                             <TextField
                                 label="Email"
-                                value={userData.email || 'N/A'}
+                                value={userData.user.email || 'N/A'}
                                 InputProps={{
                                     readOnly: true,
                                 }}
@@ -107,34 +109,35 @@ const Profile = () => {
                             />
                             <TextField
                                 label="Full Name"
-                                value={userData.full_name || 'N/A'}
+                                value={userData.user.full_name || 'N/A'}
                                 InputProps={{
                                     readOnly: true,
                                 }}
                                 variant="outlined"
                                 fullWidth
                             />
-                            <TextField
-                                label="Created On"
-                                value={userData.created_at ? new Date(userData.created_at).toLocaleString() : 'N/A'}
-                                InputProps={{
-                                    readOnly: true,
-                                }}
-                                variant="outlined"
-                                fullWidth
-                            />
-                            {userData.profile_picture_url && (
-                                <TextField
-                                    label="Profile Picture URL"
-                                    value={userData.profile_picture_url}
-                                    InputProps={{
-                                        readOnly: true,
-                                    }}
-                                    variant="outlined"
-                                    fullWidth
-                                />
-                            )}
-                            {/* You can display other user details here if available */}
+                            {/* The 'created_at' and 'profile_picture_url' are not in the response you provided */}
+                            {/* If your API returns these, you would access them like: */}
+                            {/* <TextField */}
+                            {/* label="Created On" */}
+                            {/* value={userData.user.created_at ? new Date(userData.user.created_at).toLocaleString() : 'N/A'} */}
+                            {/* InputProps={{ */}
+                            {/* readOnly: true, */}
+                            {/* }} */}
+                            {/* variant="outlined" */}
+                            {/* fullWidth */}
+                            {/* /> */}
+                            {/* {userData.user.profile_picture_url && ( */}
+                            {/* <TextField */}
+                            {/* label="Profile Picture URL" */}
+                            {/* value={userData.user.profile_picture_url} */}
+                            {/* InputProps={{ */}
+                            {/* readOnly: true, */}
+                            {/* }} */}
+                            {/* variant="outlined" */}
+                            {/* fullWidth */}
+                            {/* /> */}
+                            {/* )} */}
                         </>
                     ) : (
                         <Typography>No profile data available.</Typography>

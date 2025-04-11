@@ -6,116 +6,121 @@ import {
     Paper,
     TextField,
     Button,
-    CircularProgress,
     Alert,
+    CircularProgress,
 } from '@mui/material';
-import LoginHeader from '../components/LoginHeader'; // Adjust path as needed
+import LoginHeader from './loginheader'; // Adjust path as needed
+import Footer from '../footer';
 
 const Settings = () => {
     const navigate = useNavigate();
-    const [userData, setUserData] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
-    const [updatedFullName, setUpdatedFullName] = useState('');
-    const [updatedEmail, setUpdatedEmail] = useState('');
+    const [oldPassword, setOldPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmNewPassword, setConfirmNewPassword] = useState('');
+    const [deactivateConfirmation, setDeactivateConfirmation] = useState(false);
+    const [deactivateError, setDeactivateError] = useState('');
+    const [deactivateSuccess, setDeactivateSuccess] = useState('');
 
     useEffect(() => {
-        const fetchUserProfile = async () => {
-            setLoading(true);
-            setError('');
-            const token = localStorage.getItem('authToken');
-            if (!token) {
-                navigate('/login');
-                return;
-            }
-
-            try {
-                const response = await fetch('http://localhost:3000/api/user/profile', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                    },
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    setUserData(data);
-                    setUpdatedFullName(data.full_name || '');
-                    setUpdatedEmail(data.email || '');
-                    setLoading(false);
-                } else if (response.status === 401) {
-                    setError('Unauthorized. Please log in again.');
-                    setLoading(false);
-                    localStorage.removeItem('authToken');
-                    localStorage.removeItem('userId');
-                    localStorage.removeItem('username');
-                    navigate('/login');
-                } else {
-                    const errorData = await response.json();
-                    setError(errorData.error || 'Failed to fetch profile data.');
-                    setLoading(false);
-                }
-            } catch (err) {
-                console.error('Error fetching profile data:', err);
-                setError('Failed to connect to the server.');
-                setLoading(false);
-            }
-        };
-
-        fetchUserProfile();
-    }, [navigate]);
-
-    const handleFullNameChange = (event) => {
-        setUpdatedFullName(event.target.value);
-    };
-
-    const handleEmailChange = (event) => {
-        setUpdatedEmail(event.target.value);
-    };
-
-    const handleUpdateProfile = async () => {
-        setLoading(true);
-        setError('');
-        setSuccessMessage('');
         const token = localStorage.getItem('authToken');
-
         if (!token) {
             navigate('/login');
+        }
+        // You might want to fetch user details here if you want to display current settings
+        // For example, current email, etc.
+    }, [navigate]);
+
+    const handleChangePassword = async () => {
+        if (!oldPassword || !newPassword || !confirmNewPassword) {
+            setError('Please enter old password, new password, and confirm new password.');
             return;
         }
 
+        if (newPassword !== confirmNewPassword) {
+            setError('New password and confirm password do not match.');
+            return;
+        }
+
+        if (newPassword.length < 6) {
+            setError('New password must be at least 6 characters long.');
+            return;
+        }
+
+        setLoading(true);
+        setError('');
+        setSuccessMessage('');
+
+        const token = localStorage.getItem('authToken');
+
         try {
-            const response = await fetch('http://localhost:3000/api/user/profile', {
+            const response = await fetch('http://localhost:3000/api/user/profile/password', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`,
                 },
-                body: JSON.stringify({ full_name: updatedFullName, email: updatedEmail }),
+                body: JSON.stringify({ oldPassword, newPassword }),
             });
 
             if (response.ok) {
-                const data = await response.json();
-                setUserData(data);
-                setUpdatedFullName(data.full_name || '');
-                setUpdatedEmail(data.email || '');
-                setSuccessMessage('Profile updated successfully!');
-                setLoading(false);
+                setSuccessMessage('Password updated successfully!');
+                setOldPassword('');
+                setNewPassword('');
+                setConfirmNewPassword('');
             } else if (response.status === 401) {
-                setError('Unauthorized. Please log in again.');
-                setLoading(false);
+                const errorData = await response.json();
+                setError(errorData.error || 'Invalid old password.');
+            } else {
+                const errorData = await response.json();
+                setError(errorData.error || 'Failed to update password.');
+            }
+        } catch (err) {
+            console.error('Error updating password:', err);
+            setError('Failed to connect to the server.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleDeactivateAccount = async () => {
+        if (!deactivateConfirmation) {
+            setDeactivateError('Please confirm account deactivation.');
+            return;
+        }
+
+        setLoading(true);
+        setDeactivateError('');
+        setDeactivateSuccess('');
+
+        const token = localStorage.getItem('authToken');
+
+        try {
+            const response = await fetch('http://localhost:3000/api/user/profile/deactivate', {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+
+            if (response.ok) {
+                setDeactivateSuccess('Account deactivated successfully. You will be logged out.');
                 localStorage.removeItem('authToken');
                 localStorage.removeItem('userId');
                 localStorage.removeItem('username');
-                navigate('/login');
+                setTimeout(() => {
+                    navigate('/login');
+                }, 2000); // Redirect after a short delay
             } else {
                 const errorData = await response.json();
-                setError(errorData.error || 'Failed to update profile.');
-                setLoading(false);
+                setDeactivateError(errorData.error || 'Failed to deactivate account.');
             }
         } catch (err) {
-            console.error('Error updating profile:', err);
-            setError('Failed to connect to the server.');
+            console.error('Error deactivating account:', err);
+            setDeactivateError('Failed to connect to the server.');
+        } finally {
             setLoading(false);
         }
     };
@@ -124,61 +129,76 @@ const Settings = () => {
         <>
             <LoginHeader />
             <Container maxWidth="md" sx={{ mt: 4 }}>
-                <Paper elevation={3} sx={{ padding: 3, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <Paper elevation={3} sx={{ padding: 3, display: 'flex', flexDirection: 'column', gap: 3 }}>
                     <Typography variant="h5" gutterBottom>
-                        Edit Your Profile
+                        Settings
                     </Typography>
 
-                    {loading && <CircularProgress />}
                     {error && <Alert severity="error">{error}</Alert>}
                     {successMessage && <Alert severity="success">{successMessage}</Alert>}
 
-                    {userData && (
-                        <>
-                            <TextField
-                                label="Username"
-                                value={userData.username || 'N/A'}
-                                InputProps={{
-                                    readOnly: true,
-                                }}
-                                variant="outlined"
-                                fullWidth
-                            />
-                            <TextField
-                                label="Full Name"
-                                value={updatedFullName}
-                                onChange={handleFullNameChange}
-                                variant="outlined"
-                                fullWidth
-                            />
-                            <TextField
-                                label="Email"
-                                value={updatedEmail}
-                                onChange={handleEmailChange}
-                                variant="outlined"
-                                fullWidth
-                            />
-                            {/* You can add more editable fields here */}
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                onClick={handleUpdateProfile}
-                                sx={{ mt: 2 }}
-                                disabled={loading}
-                            >
-                                Update Profile
-                            </Button>
-                            <Button
-                                variant="outlined"
-                                onClick={() => navigate('/profile')}
-                                sx={{ mt: 1 }}
-                            >
-                                Back to Profile
-                            </Button>
-                        </>
-                    )}
+                    <Typography variant="h6">
+                        Change Password
+                    </Typography>
+                    <TextField
+                        label="Old Password"
+                        type="password"
+                        fullWidth
+                        value={oldPassword}
+                        onChange={(e) => setOldPassword(e.target.value)}
+                    />
+                    <TextField
+                        label="New Password"
+                        type="password"
+                        fullWidth
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                    />
+                    <TextField
+                        label="Confirm New Password"
+                        type="password"
+                        fullWidth
+                        value={confirmNewPassword}
+                        onChange={(e) => setConfirmNewPassword(e.target.value)}
+                    />
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={handleChangePassword}
+                        disabled={loading}
+                    >
+                        {loading ? <CircularProgress size={24} /> : 'Update Password'}
+                    </Button>
+
+                    <Typography variant="h6" sx={{ mt: 3 }}>
+                        Deactivate Account
+                    </Typography>
+                    {deactivateError && <Alert severity="error">{deactivateError}</Alert>}
+                    {deactivateSuccess && <Alert severity="success">{deactivateSuccess}</Alert>}
+                    <Typography color="warning">
+                        Warning: Deactivating your account will permanently disable it and may result in loss of data.
+                        Are you sure you want to proceed?
+                    </Typography>
+                    <label>
+                        <input
+                            type="checkbox"
+                            checked={deactivateConfirmation}
+                            onChange={(e) => setDeactivateConfirmation(e.target.checked)}
+                        />
+                        I confirm that I want to deactivate my account.
+                    </label>
+                    <Button
+                        variant="contained"
+                        color="error"
+                        onClick={handleDeactivateAccount}
+                        disabled={loading || !deactivateConfirmation}
+                    >
+                        {loading ? <CircularProgress size={24} /> : 'Deactivate Account'}
+                    </Button>
                 </Paper>
             </Container>
+            <br />
+            <Footer />
         </>
     );
 };

@@ -11,6 +11,8 @@ import CreateUrl from './homepage/login/createurl';
 import Profile from './homepage/login/profile';
 import Pricing from './homepage/pricing';
 import FullBlogPost from './homepage/login/blogs/FullyBlogPost';
+import Settings from './homepage/login/settings';
+import YourBlogs from './homepage/login/yourblogs';
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('authToken'));
 
@@ -48,6 +50,8 @@ function App() {
                 <Route path="/register" element={<RegistrationForm />} />
                 <Route path="/pricing" element={<Pricing/>}/>
                 <Route path="/blog/:id" element={<FullBlogPost />} /> {/* Route for the full blog post */}
+                <Route path="/settings" element={<Settings/>}/>
+                <Route path="/yourblog" element={<YourBlogs/>}/>
                 {/* Protected Routes */}
                 <Route
                     path="/dashboard"

@@ -4,52 +4,113 @@ import {
     CardHeader,
     CardContent,
     Avatar,
-    IconButton,
     Typography,
     CardActions,
     Box,
-    Menu,
-    MenuItem,
+    TextField,
+    InputAdornment,
+    Button,
 } from '@mui/material';
 import { red } from '@mui/material/colors';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import axios from 'axios';
 import Header from '../../header';
 import Footer from '../../footer';
 import { useNavigate } from 'react-router-dom';
+import SearchIcon from '@mui/icons-material/Search';
+import { styled, useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
-function MainLayout({ children }) {
-    return (
-        <Box
-            sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                minHeight: '100vh', // Ensure the container takes at least the full viewport height
-            }}
-        >
-            <Header />
-            <Box sx={{ flexGrow: 1 }}>{children}</Box> {/* This will push the footer down */}
-            <Footer />
-        </Box>
-    );
-}
+// Styled Components
+const CenteredSearchBox = styled(Box)(({ theme }) => ({
+    display: 'flex',
+    justifyContent: 'center',
+    marginBottom: theme.spacing(3),
+}));
 
-export default function DisplayBlog() {
+const SearchTextField = styled(TextField)(({ theme }) => ({
+    '& .MuiOutlinedInput-root': {
+        borderRadius: 20,
+        '& fieldset': {
+            borderColor: theme.palette.primary.light,
+        },
+        '&:hover fieldset': {
+            borderColor: theme.palette.primary.main,
+        },
+        '&.Mui-focused fieldset': {
+            borderColor: theme.palette.secondary.main,
+            borderWidth: 2,
+        },
+        backgroundColor: theme.palette.background.paper,
+    },
+    width: '40%',
+    maxWidth: 500,
+    [theme.breakpoints.down('sm')]: {
+        width: '80%',
+    },
+}));
+
+const BlogCard = styled(Card)(({ theme }) => ({
+    boxShadow: 3,
+    borderRadius: 8,
+    transition: 'transform 0.2s ease-in-out',
+    cursor: 'pointer',
+    '&:hover': {
+        transform: 'scale(1.02)',
+        boxShadow: 6,
+    },
+}));
+
+const BlogCardHeader = styled(CardHeader)(({ theme }) => ({
+    backgroundColor: theme.palette.info.main,
+    color: '#fff',
+    padding: theme.spacing(2),
+    '& .MuiCardHeader-content': {
+        overflow: 'visible',
+        whiteSpace: 'normal',
+        wordBreak: 'break-word',
+    },
+    '& .MuiTypography-h6': {
+        fontSize: '1rem',
+        [theme.breakpoints.down('sm')]: {
+            fontSize: '0.95rem',
+        },
+    },
+}));
+
+const BlogCardContent = styled(CardContent)(({ theme }) => ({
+    padding: theme.spacing(2),
+    '& .MuiTypography-body2': {
+        display: '-webkit-box',
+        WebkitLineClamp: 3,
+        WebkitBoxOrient: 'vertical',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        marginBottom: theme.spacing(1),
+    },
+}));
+
+const BlogCardActions = styled(CardActions)(({ theme }) => ({
+    padding: theme.spacing(1.5),
+    justifyContent: 'space-between',
+}));
+
+// DisplayBlog Component
+function DisplayBlog() {
     const [blogPosts, setBlogPosts] = useState([]);
-    const [error, setError] = useState('');
+    const [filteredBlogPosts, setFilteredBlogPosts] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
-    const [anchorEl, setAnchorEl] = useState(null);
-    const [selectedPostId, setSelectedPostId] = useState(null);
+    const [error, setError] = useState('');
     const navigate = useNavigate();
-    const token = localStorage.getItem('authToken');
-    const open = Boolean(anchorEl);
+    const theme = useTheme();
 
+    // Fetch blog posts
     const fetchBlogPosts = async () => {
         try {
             const response = await axios.get('http://localhost:3000/api/blogs/list');
             setBlogPosts(response.data);
-        } catch (error) {
-            console.error('Error fetching blog posts:', error.response?.data?.error || error.message);
+        } catch (err) {
+            console.error('Error fetching blog posts:', err.message);
             setError('Failed to load blog posts.');
         } finally {
             setLoading(false);
@@ -60,47 +121,17 @@ export default function DisplayBlog() {
         fetchBlogPosts();
     }, []);
 
-    const handleMenuOpen = (event, postId) => {
-        setAnchorEl(event.currentTarget);
-        setSelectedPostId(postId);
-    };
+    useEffect(() => {
+        const filtered = blogPosts.filter(
+            (post) =>
+                post.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                post.author?.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        setFilteredBlogPosts(filtered);
+    }, [searchTerm, blogPosts]);
 
-    const handleMenuClose = () => {
-        setAnchorEl(null);
-        setSelectedPostId(null);
-    };
-
-    const handleEdit = () => {
-        handleMenuClose();
-        if (selectedPostId) {
-            navigate(`/edit-blog/${selectedPostId}`);
-        }
-    };
-
-    const handleDelete = async () => {
-        handleMenuClose();
-        if (selectedPostId) {
-            if (!token) {
-                alert('You must be logged in to delete a blog post.');
-                navigate('/login');
-                return;
-            }
-
-            try {
-                const response = await axios.delete(`http://localhost:3000/api/blogs/${selectedPostId}`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-                console.log('Blog post deleted:', response.data);
-                // Refresh the blog list after successful deletion
-                fetchBlogPosts();
-            } catch (error) {
-                const errMsg = error.response?.data?.error || error.message;
-                console.error('Error deleting blog post:', errMsg);
-                alert(`Failed to delete blog post: ${errMsg}`);
-            }
-        }
+    const handleSearchChange = (e) => {
+        setSearchTerm(e.target.value);
     };
 
     const handleCardClick = (postId) => {
@@ -108,47 +139,53 @@ export default function DisplayBlog() {
     };
 
     return (
-        <MainLayout>
-            <Box sx={{ padding: '30px', backgroundColor: '#f9f9f9' }}>
-                <Typography variant="h4" sx={{ mb: 4, textAlign: 'center' }}>
-                    📚 Existing Blog Posts
-                </Typography>
+        <Box sx={{ padding: 4, backgroundColor: '#f9f9f9' }}>
+            <Typography variant="h4" align="center" sx={{ color: 'primary.main', mb: 4 }}>
+                📚 Explore Our Thoughtful Blogs
+            </Typography>
 
-                {loading && <Typography>Loading...</Typography>}
-                {error && <Typography color="error">{error}</Typography>}
-                {!loading && blogPosts.length === 0 && (
-                    <Typography>No blog posts found.</Typography>
-                )}
+            <CenteredSearchBox>
+                <SearchTextField
+                    label="Search Blogs"
+                    variant="outlined"
+                    size="small"
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <SearchIcon color="primary" />
+                            </InputAdornment>
+                        ),
+                    }}
+                />
+            </CenteredSearchBox>
 
+            {loading && <Typography align="center">Loading blog posts...</Typography>}
+            {error && <Typography align="center" color="error">{error}</Typography>}
+            {!loading && filteredBlogPosts.length === 0 && (
+                <Typography align="center">No blog posts found matching your search.</Typography>
+            )}
+
+            {!loading && filteredBlogPosts.length > 0 && (
                 <Box
                     sx={{
                         display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-                        gap: 4,
+                        gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+                        gap: 3,
+                        mt: 3,
+                        px: 2,
                     }}
                 >
-                    {blogPosts.map((post) => (
-                        <Card
-                            key={post.id}
-                            sx={{ boxShadow: 3, borderRadius: 3, cursor: 'pointer' }}
-                            onClick={() => handleCardClick(post.id)}
-                        >
-                            <CardHeader
+                    {filteredBlogPosts.map((post) => (
+                        <BlogCard key={post.id} onClick={() => handleCardClick(post.id)}>
+                            <BlogCardHeader
                                 avatar={
                                     <Avatar sx={{ bgcolor: red[500] }}>
-                                        {post.author ? post.author[0].toUpperCase() : 'A'}
+                                        {post.author?.[0]?.toUpperCase() || 'A'}
                                     </Avatar>
                                 }
-                                action={
-                                    token && ( // Only show the menu if the user is logged in
-                                        <IconButton aria-label="settings" onClick={(event) => {
-                                            event.stopPropagation(); // Prevent card click when menu is opened
-                                            handleMenuOpen(event, post.id);
-                                        }}>
-                                            <MoreVertIcon />
-                                        </IconButton>
-                                    )
-                                }
+                                titleTypographyProps={{ variant: 'h6' }}
                                 title={post.title}
                                 subheader={
                                     post.created_at
@@ -156,43 +193,47 @@ export default function DisplayBlog() {
                                         : ''
                                 }
                             />
-
-                            <CardContent>
+                            <BlogCardContent>
                                 <Typography
                                     variant="body2"
-                                    color="text.secondary"
-                                    sx={{
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                        display: '-webkit-box',
-                                        WebkitLineClamp: 3, // Show only 3 lines of content
-                                        WebkitBoxOrient: 'vertical',
-                                    }}
-                                    dangerouslySetInnerHTML={{ __html: post.content }}
+                                    color="text.primary"
+                                    dangerouslySetInnerHTML={{ __html: post.content_preview || post.content }}
                                 />
-                            </CardContent>
-
-                            <CardActions sx={{ px: 2, pb: 2 }}>
+                            </BlogCardContent>
+                            <BlogCardActions>
                                 {post.author && (
                                     <Typography variant="caption" color="text.secondary">
-                                        ✍️ Author: {post.author}
+                                        ✍️ By: {post.author.toUpperCase()}
                                     </Typography>
                                 )}
-                            </CardActions>
-                        </Card>
+                                <Button size="small" color="primary">
+                                    Read More
+                                </Button>
+                            </BlogCardActions>
+                        </BlogCard>
                     ))}
                 </Box>
-            </Box>
+            )}
+        </Box>
+    );
+}
 
-            <Menu
-                anchorEl={anchorEl}
-                open={open}
-                onClose={handleMenuClose}
-            >
-                <MenuItem onClick={handleEdit}>Edit</MenuItem>
-                <MenuItem onClick={handleDelete}>Delete</MenuItem>
-                {/* Add more options here if needed */}
-            </Menu>
+// Layout Wrapper
+function MainLayout({ children }) {
+    return (
+        <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+            <Header />
+            <Box sx={{ flexGrow: 1 }}>{children}</Box>
+            <Footer />
+        </Box>
+    );
+}
+
+// Exported Component with Layout
+export default function DisplayBlogWithLayout() {
+    return (
+        <MainLayout>
+            <DisplayBlog />
         </MainLayout>
     );
 }

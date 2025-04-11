@@ -103,7 +103,7 @@ function Body() {
               data-suffix={stat.suffix}
               ref={(el) => (numberRefs.current[index] = el)}
             >
-              0{stat.suffix}
+              0{stat.suffix} {/* Initialize with 0 + suffix */}
             </span>
             <span className="stats-label">{stat.label}</span>
           </div>

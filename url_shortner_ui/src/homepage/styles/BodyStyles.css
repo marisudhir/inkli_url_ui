@@ -111,7 +111,7 @@
 }
 
 .animated-number::after {
-  content: attr(data-value-start); /* Initial value */
+  /*content: attr(data-value-start); /* Initial value */
   animation: count 3s linear forwards; /* Adjust animation duration */
 }
 
