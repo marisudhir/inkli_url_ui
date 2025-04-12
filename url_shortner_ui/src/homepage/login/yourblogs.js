@@ -1,143 +1,227 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-//import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
+import {
+  Box,
+  Button,
+  CardHeader,
+  CardContent,
+  CardActions,
+  Avatar,
+  Typography,
+  CircularProgress,
+  Alert,
+  useTheme
+} from '@mui/material';
+import { red } from '@mui/material/colors';
+import { useNavigate } from 'react-router-dom';
+import LoginHeader from './loginheader';
+import { styled } from '@mui/material/styles';
+
+// Styled Components
+const BlogCard = styled(CardContent)(({ theme }) => ({
+  boxShadow: theme.shadows[3],
+  borderRadius: 8,
+  backgroundColor: '#fff',
+  transition: 'transform 0.2s ease-in-out',
+  cursor: 'pointer',
+  '&:hover': {
+    transform: 'scale(1.02)',
+    boxShadow: theme.shadows[6],
+  },
+}));
+
+const BlogCardHeader = styled(CardHeader)(({ theme }) => ({
+  backgroundColor: theme.palette.info.main,
+  color: '#fff',
+  padding: theme.spacing(2),
+  '& .MuiTypography-h6': {
+    fontSize: '1rem',
+  },
+}));
+
+const BlogCardContent = styled(Box)(({ theme }) => ({
+  padding: theme.spacing(2),
+  '& .MuiTypography-body2': {
+    display: '-webkit-box',
+    WebkitLineClamp: 3,
+    WebkitBoxOrient: 'vertical',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+}));
+
+const BlogCardActions = styled(CardActions)(({ theme }) => ({
+  padding: theme.spacing(1.5),
+  justifyContent: 'flex-end',
+}));
 
 const YourBlogs = () => {
-    const [blogs, setBlogs] = useState([]);
-    const [editingBlogId, setEditingBlogId] = useState(null);
-    const [editTitle, setEditTitle] = useState('');
-    const [editContent, setEditContent] = useState('');
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
+  const [blogs, setBlogs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
+  const theme = useTheme();
 
-   // const navigate = useNavigate();
+  const fetchBlogs = async () => {
+    setLoading(true);
+    setError('');
 
-    const fetchBlogs = async () => {
-        setLoading(true);
-        setError('');
-        try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get('http://localhost:3000/api/blogs/me', {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            setBlogs(response.data);
-        } catch (err) {
-            console.error('Error fetching your blogs:', err);
-            setError('Failed to fetch your blogs. Please try again later.');
-        } finally {
-            setLoading(false);
-        }
-    };
+    try {
+      const rawToken = localStorage.getItem('authToken');
+      if (!rawToken) {
+        setError('You are not logged in.');
+        setLoading(false);
+        return;
+      }
 
-    const handleEdit = (blog) => {
-        setEditingBlogId(blog.id);
-        setEditTitle(blog.title);
-        setEditContent(blog.content);
-    };
+      const decodedToken = jwtDecode(rawToken);
+      const currentTime = Date.now() / 1000;
 
-    const handleUpdate = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            await axios.put(
-                `http://localhost:3000/api/blogs/${editingBlogId}`,
-                { title: editTitle, content: editContent },
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-            setEditingBlogId(null);
-            fetchBlogs();
-        } catch (err) {
-            console.error('Error updating blog:', err);
-            setError('Failed to update the blog. Please try again.');
-        }
-    };
+      if (decodedToken.exp < currentTime) {
+        setError('Your session has expired. Please log in again.');
+        setLoading(false);
+        return;
+      }
 
-    const handleDelete = async (id) => {
-        if (window.confirm('Are you sure you want to delete this blog?')) {
-            try {
-                const token = localStorage.getItem('token');
-                await axios.delete(`http://localhost:3000/api/blogs/${id}`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-                fetchBlogs();
-            } catch (err) {
-                console.error('Error deleting blog:', err);
-                setError('Failed to delete the blog. Please try again.');
-            }
-        }
-    };
+      const response = await axios.get('http://localhost:3000/api/blogs/me', {
+        headers: { Authorization: `Bearer ${rawToken}` },
+      });
 
-    useEffect(() => {
-        fetchBlogs();
-    }, []);
-
-    if (loading) {
-        return <div className="p-6">Loading your blogs...</div>;
+      setBlogs(response.data);
+    } catch (err) {
+      console.error('Error fetching your blogs:', err);
+      setError('Failed to fetch your blogs. Please try again later.');
+    } finally {
+      setLoading(false);
     }
+  };
 
-    if (error) {
-        return <div className="p-6 text-red-500">{error}</div>;
+  const handleEdit = (blogId) => {
+    navigate(`/edit/${blogId}`);
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this blog?')) return;
+
+    try {
+      const token = localStorage.getItem('authToken');
+      if (!token) return;
+
+      await axios.delete(`http://localhost:3000/api/blogs/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      fetchBlogs();
+    } catch (err) {
+      console.error('Error deleting blog:', err);
+      setError('Failed to delete the blog. Please try again.');
     }
+  };
 
-    return (
-        <div className="p-6">
-            <h2 className="text-2xl font-bold mb-4">Your Blogs</h2>
-            {blogs.length === 0 ? (
-                <p>You haven't created any blogs yet.</p>
-            ) : (
-                blogs.map((blog) => (
-                    <div key={blog.id} className="border rounded p-4 mb-4 bg-white shadow">
-                        {editingBlogId === blog.id ? (
-                            <>
-                                <input
-                                    className="block w-full mb-2 p-2 border"
-                                    value={editTitle}
-                                    onChange={(e) => setEditTitle(e.target.value)}
-                                />
-                                <textarea
-                                    className="block w-full mb-2 p-2 border"
-                                    value={editContent}
-                                    onChange={(e) => setEditContent(e.target.value)}
-                                />
-                                <div className="mt-2">
-                                    <button
-                                        onClick={handleUpdate}
-                                        className="bg-blue-500 text-white px-4 py-2 mr-2 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
-                                    >
-                                        Update
-                                    </button>
-                                    <button
-                                        onClick={() => setEditingBlogId(null)}
-                                        className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-1"
-                                    >
-                                        Cancel
-                                    </button>
-                                </div>
-                            </>
-                        ) : (
-                            <>
-                                <h3 className="text-xl font-semibold mb-1">{blog.title}</h3>
-                                <p className="text-gray-700 mb-2">{blog.content}</p>
-                                <div className="mt-2">
-                                    <button
-                                        onClick={() => handleEdit(blog)}
-                                        className="bg-yellow-500 text-white px-4 py-1 mr-2 rounded hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-1"
-                                    >
-                                        Edit
-                                    </button>
-                                    <button
-                                        onClick={() => handleDelete(blog.id)}
-                                        className="bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1"
-                                    >
-                                        Delete
-                                    </button>
-                                </div>
-                            </>
-                        )}
-                    </div>
-                ))
-            )}
-        </div>
-    );
+  const handleArchive = async (id) => {
+    if (!window.confirm('Do you want to archive this blog?')) return;
+
+    try {
+      const token = localStorage.getItem('authToken');
+      if (!token) return;
+
+      await axios.patch(`http://localhost:3000/api/blogs/archive/${id}`, null, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      fetchBlogs();
+    } catch (err) {
+      console.error('Error archiving blog:', err);
+      setError('Failed to archive the blog. Please try again.');
+    }
+  };
+
+  useEffect(() => {
+    fetchBlogs();
+  }, []);
+
+  return (
+    <>
+      <LoginHeader />
+      <Box p={4}>
+        <Typography variant="h4" gutterBottom>Your Blogs</Typography>
+
+        {loading ? (
+          <Box display="flex" justifyContent="center" alignItems="center" minHeight="30vh">
+            <CircularProgress />
+          </Box>
+        ) : error ? (
+          <Box m={2}>
+            <Alert severity="error">{error}</Alert>
+          </Box>
+        ) : blogs.length === 0 ? (
+          <Typography>You haven't created any blogs yet.</Typography>
+        ) : (
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+              gap: 3,
+              mt: 3,
+              px: 2,
+            }}
+          >
+            {blogs.map((post) => (
+              <BlogCard key={post.id}>
+                <BlogCardHeader
+                  avatar={
+                    <Avatar sx={{ bgcolor: red[500] }}>
+                      {post.author?.[0]?.toUpperCase() || 'A'}
+                    </Avatar>
+                  }
+                  titleTypographyProps={{ variant: 'h6' }}
+                  title={post.title}
+                  subheader={
+                    post.created_at
+                      ? new Date(post.created_at).toLocaleDateString()
+                      : ''
+                  }
+                />
+                <BlogCardContent>
+                  <Typography
+                    variant="body2"
+                    color="text.primary"
+                    dangerouslySetInnerHTML={{
+                      __html: post.content_preview || post.content,
+                    }}
+                  />
+                </BlogCardContent>
+                <BlogCardActions>
+                  <Button
+                    variant="outlined"
+                    color="warning"
+                    onClick={() => handleEdit(post.id)}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    onClick={() => handleDelete(post.id)}
+                  >
+                    Delete
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="info"
+                    onClick={() => handleArchive(post.id)}
+                  >
+                    Archive
+                  </Button>
+                </BlogCardActions>
+              </BlogCard>
+            ))}
+          </Box>
+        )}
+      </Box>
+    </>
+  );
 };
 
 export default YourBlogs;

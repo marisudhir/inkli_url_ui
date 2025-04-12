@@ -38,7 +38,7 @@ import TablePagination from '@mui/material/TablePagination';
 import SearchIcon from '@mui/icons-material/Search';
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
-import RefreshIcon from '@mui/icons-material/Refresh'; // Import RefreshIcon
+import RefreshIcon from '@mui/icons-material/Refresh';
 import LoginHeader from './loginheader';
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
@@ -56,6 +56,19 @@ const modalStyle = {
     border: '2px solid #000',
     boxShadow: 24,
     p: 4,
+};
+
+const welcomeModalStyle = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+    textAlign: 'center',
 };
 
 // --- Sorting Functions ---
@@ -219,6 +232,8 @@ const Dashboard = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const navigate = useNavigate();
+    const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+    const [hasLoggedInOnce, setHasLoggedInOnce] = useState(false); // To track if the user has logged in before
 
     // Sorting state
     const [order, setOrder] = useState('desc');
@@ -253,6 +268,18 @@ const Dashboard = () => {
                 setDashboardData(data);
                 setShortenedUrls(data.recentUrls || []);
                 setLoading(false);
+
+                // Show welcome modal on the first successful login
+                const firstLogin = localStorage.getItem('firstLogin');
+                if (firstLogin) {
+                    setShowWelcomeModal(true);
+                    localStorage.removeItem('firstLogin'); // Clear the flag
+                    setHasLoggedInOnce(true);
+                } else if (!hasLoggedInOnce && token) {
+                    // If token exists and it's not the very first login, don't show the modal again
+                    setHasLoggedInOnce(true);
+                }
+
             } else if (response.status === 401) {
                 setError('Unauthorized. Please log in again.');
                 setLoading(false);
@@ -310,6 +337,10 @@ const Dashboard = () => {
         setSelectedUrlAnalytics(null);
     };
 
+    const handleCloseWelcomeModal = () => {
+        setShowWelcomeModal(false);
+    };
+
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
     };
@@ -354,6 +385,26 @@ const Dashboard = () => {
             <Typography variant="h4" gutterBottom>
                 Dashboard
             </Typography>
+
+            {/* Welcome Modal */}
+            <Modal
+                open={showWelcomeModal}
+                onClose={handleCloseWelcomeModal}
+                aria-labelledby="welcome-modal-title"
+                aria-describedby="welcome message after first login"
+            >
+                <Box sx={welcomeModalStyle}>
+                    <Typography id="welcome-modal-title" variant="h6" component="h2" gutterBottom>
+                        Welcome!
+                    </Typography>
+                    <Typography sx={{ mb: 1 }}>
+                        This platform is not just for shortening URLs! You can also enjoy our blogging features with AI-powered content generation.
+                    </Typography>
+                    <Button onClick={handleCloseWelcomeModal} autoFocus>
+                        Okay, I understand
+                    </Button>
+                </Box>
+            </Modal>
 
             {/* Overview Metrics */}
             <Grid container spacing={3} sx={{ mb: 3 }}>
@@ -549,7 +600,6 @@ const Dashboard = () => {
         </Container>
         </>
     );
-
 };
 
 export default Dashboard;

@@ -31,7 +31,7 @@ function FullBlogPost() {
             setLoading(true);
             setError('');
             try {
-                const response = await axios.get(`http://localhost:3000/api/blogs/${id}`);
+                const response = await axios.get(`http://localhost:3000/api/blogs/post/${id}`);
                 setBlogPost(response.data);
             } catch (error) {
                 console.error('Error fetching blog post:', error.response?.data?.error || error.message);
@@ -74,17 +74,6 @@ function FullBlogPost() {
     if (!blogPost) {
         return null;
     }
-
-    // Extract the first few lines for a short description
-
-    // const getFirstLines = (content, lineCount = 2) => {
-    //     if (!content) return '';
-    //     const plainText = content.replace(/<[^>]*>/g, ''); // Remove HTML tags
-    //     const lines = plainText.split('\n').filter(line => line.trim() !== ''); // Split by lines and remove empty ones
-    //     return lines.slice(0, lineCount).join('\n');
-    // };
-
-    // const shortDescription = getFirstLines(blogPost.content);
 
     return (
         <Box
@@ -149,11 +138,9 @@ function FullBlogPost() {
                                             <CardMedia
                                                 component="img"
                                                 height="140"
-                                                // Use relatedPost.image if it exists, otherwise use defaultImage
                                                 image={relatedPost.image || defaultImage}
                                                 alt={relatedPost.title}
                                                 onError={(e) => {
-                                                    // Optional: Handle image loading errors, e.g., set to default on error
                                                     e.target.onerror = null; // Prevent infinite loop
                                                     e.target.src = defaultImage;
                                                 }}

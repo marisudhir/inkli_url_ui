@@ -28,7 +28,7 @@ function Footer() {
           <Grid item>
             <Box sx={{ display: 'flex' }}>
               <Link
-                href="YOUR_INSTAGRAM_LINK_HERE"
+                href="https://www.instagram.com/inklidox_labs/"
                 target="_blank"
                 rel="noopener noreferrer"
                 color="inherit"
@@ -37,22 +37,13 @@ function Footer() {
                 <FontAwesomeIcon icon={faInstagram} size="lg" />
               </Link>
               <Link
-                href="YOUR_LINKEDIN_LINK_HERE"
+                href="https://www.linkedin.com/company/inklidox-technologies-private-limited/"
                 target="_blank"
                 rel="noopener noreferrer"
                 color="inherit"
                 sx={{ marginRight: '15px' }}
               >
                 <FontAwesomeIcon icon={faLinkedin} size="lg" />
-              </Link>
-              <Link
-                href="YOUR_Facebook_LINK_HERE"
-                target="_blank"
-                rel="noopener noreferrer"
-                color="inherit"
-                sx={{ marginRight: '15px' }}
-              >
-                <FontAwesomeIcon icon={faFacebook} size="lg" />
               </Link>
               <Link
                 href="YOUR_youtube_LINK_HERE"

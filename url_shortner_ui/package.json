@@ -20,6 +20,7 @@
     "date-fns": "^4.1.0",
     "font-awesome": "^4.7.0",
     "froala-editor": "^4.5.1",
+    "jwt-decode": "^4.0.0",
     "react": "^18.2.0",
     "react-bootstrap": "^2.10.9",
     "react-dom": "^18.2.0",
