@@ -17,8 +17,7 @@ import Header from '../../header';
 import Footer from '../../footer';
 import { useNavigate } from 'react-router-dom';
 import SearchIcon from '@mui/icons-material/Search';
-import { styled, useTheme } from '@mui/material/styles';
-import useMediaQuery from '@mui/material/useMediaQuery';
+import { styled } from '@mui/material/styles';
 
 // Styled Components
 const CenteredSearchBox = styled(Box)(({ theme }) => ({
@@ -102,8 +101,6 @@ function DisplayBlog() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const navigate = useNavigate();
-    const theme = useTheme();
-
     // Fetch blog posts
     const fetchBlogPosts = async () => {
         try {

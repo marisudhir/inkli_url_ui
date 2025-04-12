@@ -10,8 +10,7 @@ import {
   Avatar,
   Typography,
   CircularProgress,
-  Alert,
-  useTheme
+  Alert
 } from '@mui/material';
 import { red } from '@mui/material/colors';
 import { useNavigate } from 'react-router-dom';
@@ -61,7 +60,6 @@ const YourBlogs = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const theme = useTheme();
 
   const fetchBlogs = async () => {
     setLoading(true);
