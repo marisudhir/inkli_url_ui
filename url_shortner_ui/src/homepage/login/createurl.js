@@ -79,7 +79,7 @@ function CreateUrl() { // Renamed component to CreateUrl to be more specific
     const [copySnackbarOpen, setCopySnackbarOpen] = useState(false);
 
     const shortenedUrlRef = useRef(null);
-    const API_BASE_URL = "http://http://143.110.246.124/";
+    const API_BASE_URL = "http://http://http://localhost:3000/";
 
     const handleCloseSnackbar = (event, reason) => {
         if (reason === 'clickaway') {

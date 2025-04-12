@@ -45,7 +45,7 @@ const RegistrationForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await fetch("http://http://143.110.246.124//api/auth/register", { // Changed endpoint to /api/auth/register
+            const res = await fetch("http://http://http://localhost:3000//api/auth/register", { // Changed endpoint to /api/auth/register
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

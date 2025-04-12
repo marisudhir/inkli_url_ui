@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-
 import LoginHeader from '../loginheader';
 import TextEditor from './texteditor';
 
@@ -18,8 +17,8 @@ function CreateBlogs() {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
-  const token = localStorage.getItem('authToken');
-  const geminiApiKey = 'AIzaSyD--0KBT8ljqO_mjKeP-MSGQlXxB3ts2Nc';
+  const token = localStorage.getItem('authToken'); 
+  const geminiApiKey = process.env.REACT_APP_GEMINI_API_KEY;
   const maxAiUses = 5;
 
   const handleCreatePost = async () => {
@@ -36,7 +35,7 @@ function CreateBlogs() {
 
     try {
       const response = await axios.post(
-        'http://http://143.110.246.124//api/blogs/create',
+        'http://localhost:3000/api/blogs/create',
         { title, content },
         {
           headers: {

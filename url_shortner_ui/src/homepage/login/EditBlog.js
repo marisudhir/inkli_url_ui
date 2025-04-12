@@ -19,7 +19,7 @@ const EditBlog = () => {
         const fetchBlog = async () => {
             try {
                 const token = localStorage.getItem('authToken');
-                const res = await axios.get(`http://http://143.110.246.124//api/blogs/post/${postId}`, {
+                const res = await axios.get(`http://localhost:3000/api/blogs/post/${postId}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
 
@@ -52,7 +52,7 @@ const EditBlog = () => {
         try {
             const token = localStorage.getItem('authToken');
             await axios.put(
-                `http://http://143.110.246.124//api/blogs/${postId}`,
+                `http://localhost:3000/api/blogs/${postId}`,
                 { title, content },
                 { headers: { Authorization: `Bearer ${token}` } }
             );

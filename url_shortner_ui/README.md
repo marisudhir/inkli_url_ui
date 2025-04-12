@@ -9,7 +9,7 @@ In the project directory, you can run:
 ### `npm start`
 
 Runs the app in the development mode.\
-Open [http://http://143.110.246.124/](http://http://143.110.246.124/) to view it in your browser.
+Open [http://http://http://localhost:3000/](http://http://http://localhost:3000/) to view it in your browser.
 
 The page will reload when you make changes.\
 You may also see any lint errors in the console.
