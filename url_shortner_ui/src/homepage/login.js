@@ -52,7 +52,7 @@ const Login = () => {
     const navigate = useNavigate();
 
     // Define API base URL
-    const API_BASE_URL = 'http://localhost:3000'; // Or get from environment variables
+    const API_BASE_URL = 'http://http://143.110.246.124/'; // Or get from environment variables
 
     const handleLogin = async (e) => {
         e.preventDefault(); // Prevent default form submission

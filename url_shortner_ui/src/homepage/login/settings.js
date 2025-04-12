@@ -56,7 +56,7 @@ const Settings = () => {
         const token = localStorage.getItem('authToken');
 
         try {
-            const response = await fetch('http://localhost:3000/api/user/profile/password', {
+            const response = await fetch('http://http://143.110.246.124//api/user/profile/password', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -98,7 +98,7 @@ const Settings = () => {
         const token = localStorage.getItem('authToken');
 
         try {
-            const response = await fetch('http://localhost:3000/api/user/profile/deactivate', {
+            const response = await fetch('http://http://143.110.246.124//api/user/profile/deactivate', {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,

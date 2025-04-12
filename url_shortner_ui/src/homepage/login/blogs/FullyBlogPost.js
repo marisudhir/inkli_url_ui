@@ -31,7 +31,7 @@ function FullBlogPost() {
             setLoading(true);
             setError('');
             try {
-                const response = await axios.get(`http://localhost:3000/api/blogs/post/${id}`);
+                const response = await axios.get(`http://http://143.110.246.124//api/blogs/post/${id}`);
                 setBlogPost(response.data);
             } catch (error) {
                 console.error('Error fetching blog post:', error.response?.data?.error || error.message);
@@ -44,7 +44,7 @@ function FullBlogPost() {
         const fetchRelatedPosts = async () => {
             try {
                 // Adjust the API endpoint and logic to fetch related posts
-                const response = await axios.get('http://localhost:3000/api/blogs/list?limit=3'); // Example: Get latest 3
+                const response = await axios.get('http://http://143.110.246.124//api/blogs/list?limit=3'); // Example: Get latest 3
                 setRelatedPosts(response.data.filter(post => post.id !== parseInt(id))); // Exclude current post
             } catch (error) {
                 console.error('Error fetching related posts:', error.response?.data?.error || error.message);

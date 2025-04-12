@@ -84,7 +84,7 @@ const YourBlogs = () => {
         return;
       }
 
-      const response = await axios.get('http://localhost:3000/api/blogs/me', {
+      const response = await axios.get('http://http://143.110.246.124//api/blogs/me', {
         headers: { Authorization: `Bearer ${rawToken}` },
       });
 
@@ -108,7 +108,7 @@ const YourBlogs = () => {
       const token = localStorage.getItem('authToken');
       if (!token) return;
 
-      await axios.delete(`http://localhost:3000/api/blogs/${id}`, {
+      await axios.delete(`http://http://143.110.246.124//api/blogs/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -126,7 +126,7 @@ const YourBlogs = () => {
       const token = localStorage.getItem('authToken');
       if (!token) return;
 
-      await axios.patch(`http://localhost:3000/api/blogs/archive/${id}`, null, {
+      await axios.patch(`http://http://143.110.246.124//api/blogs/archive/${id}`, null, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

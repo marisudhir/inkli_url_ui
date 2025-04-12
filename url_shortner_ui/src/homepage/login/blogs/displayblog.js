@@ -107,7 +107,7 @@ function DisplayBlog() {
     // Fetch blog posts
     const fetchBlogPosts = async () => {
         try {
-            const response = await axios.get('http://localhost:3000/api/blogs/list');
+            const response = await axios.get('http://http://143.110.246.124//api/blogs/list');
             setBlogPosts(response.data);
         } catch (err) {
             console.error('Error fetching blog posts:', err.message);

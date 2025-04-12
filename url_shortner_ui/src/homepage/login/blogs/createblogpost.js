@@ -36,7 +36,7 @@ function CreateBlogs() {
 
     try {
       const response = await axios.post(
-        'http://localhost:3000/api/blogs/create',
+        'http://http://143.110.246.124//api/blogs/create',
         { title, content },
         {
           headers: {

@@ -257,7 +257,7 @@ const Dashboard = () => {
         }
 
         try {
-            const response = await fetch('http://localhost:3000/api/dashboard', {
+            const response = await fetch('http://http://143.110.246.124//api/dashboard', {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 },
@@ -311,7 +311,7 @@ const Dashboard = () => {
     const handleViewAnalytics = async (shortUrlId) => {
         const token = localStorage.getItem('authToken');
         try {
-            const response = await fetch(`http://localhost:3000/api/urls/analytics/${shortUrlId}`, {
+            const response = await fetch(`http://http://143.110.246.124//api/urls/analytics/${shortUrlId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 },
@@ -469,14 +469,14 @@ const Dashboard = () => {
                                 {visibleRows.map((url) => (
                                     <TableRow key={url.id}>
                                         <TableCell>{url.original_url}</TableCell>
-                                        <TableCell>{`http://localhost:3000/${url.short_url}`}</TableCell>
+                                        <TableCell>{`http://http://143.110.246.124//${url.short_url}`}</TableCell>
                                         <TableCell align="right">{new Date(url.created_at).toLocaleDateString()}</TableCell>
                                         {/* <TableCell align="right">{url.clicks || 0}</TableCell> */}
                                         <TableCell>
                                             <Button size="small" onClick={() => handleViewAnalytics(url.short_url)}> {/* Use short_url as ID */}
                                                 View Analytics
                                             </Button>
-                                            <Button size="small" onClick={() => navigator.clipboard.writeText(`http://localhost:3000/${url.short_url}`)}>
+                                            <Button size="small" onClick={() => navigator.clipboard.writeText(`http://http://143.110.246.124//${url.short_url}`)}>
                                                 Copy
                                             </Button>
                                         </TableCell>

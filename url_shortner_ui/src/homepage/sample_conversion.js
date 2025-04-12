@@ -87,7 +87,7 @@ function ShortURLSample() {
     const [copySnackbarOpen, setCopySnackbarOpen] = useState(false);
 
     const shortenedUrlRef = useRef(null);
-    const API_BASE_URL = "http://localhost:3000"; // Define base URL
+    const API_BASE_URL = "http://143.110.246.124"; // Define base URL
 
     // --- Load anonymous count from local storage on mount ---
     useEffect(() => {
