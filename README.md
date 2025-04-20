@@ -3,7 +3,7 @@
 
 Welcome to the frontend of the **Short URL App** by **Inklidox** — a fast, minimal, and intuitive way to shorten, manage, and track URLs.
 
-Built with ❤️ by the team at [Inklidox Technologies](https://inklidox.com) from Coimbatore to the World 🌎.
+Built with ❤️ by the team at [Inklidox Technologies](https://labs.inklidox.com) from Coimbatore to the World 🌎.
 
 ---
 
