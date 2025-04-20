@@ -8,7 +8,10 @@ import {
     Button,
     CircularProgress,
     Alert,
+    Box,
+    IconButton,
 } from '@mui/material';
+import ArchiveIcon from '@mui/icons-material/Archive';
 import LoginHeader from './loginheader'; // Adjust path as needed
 import Footer from '../footer';
 
@@ -29,7 +32,7 @@ const Profile = () => {
             }
 
             try {
-                const response = await fetch('http://http://http://localhost:3000//api/user/profile', {
+                const response = await fetch('http://localhost:3000/api/user/profile', {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                     },
@@ -37,8 +40,8 @@ const Profile = () => {
 
                 if (response.ok) {
                     const data = await response.json();
-                    console.log("API Response in Frontend:", data); // Log the response
-                    setUserData(data); // The entire response object
+                    console.log("API Response in Frontend:", data);
+                    setUserData(data);
                     setLoading(false);
                 } else if (response.status === 401) {
                     setError('Unauthorized. Please log in again.');
@@ -65,20 +68,35 @@ const Profile = () => {
         fetchUserProfile();
     }, [navigate]);
 
+    const handleViewArchived = () => {
+        navigate('/archived-blogs'); // Navigate to the archived blogs page
+    };
+
     return (
-        <>
+        <Box
+            sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                minHeight: '100vh', // Ensure the container takes at least the full viewport height
+            }}
+        >
             <LoginHeader />
-            <Container maxWidth="md" sx={{ mt: 4 }}>
+            <Container maxWidth="md" sx={{ mt: 4, flexGrow: 1 }}> {/* flexGrow will push the footer down */}
                 <Paper elevation={3} sx={{ padding: 3, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    <Typography variant="h5" gutterBottom>
-                        Your Profile
-                    </Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Typography variant="h5" gutterBottom>
+                            Your Profile
+                        </Typography>
+                        <IconButton color="primary" onClick={handleViewArchived}>
+                            <ArchiveIcon />
+                        </IconButton>
+                    </Box>
 
                     {loading ? (
                         <CircularProgress />
                     ) : error ? (
                         <Alert severity="error">{error}</Alert>
-                    ) : userData?.user ? ( // Access the 'user' property
+                    ) : userData?.user ? (
                         <>
                             <TextField
                                 label="ID"
@@ -116,8 +134,7 @@ const Profile = () => {
                                 variant="outlined"
                                 fullWidth
                             />
-                            {/* The 'created_at' and 'profile_picture_url' are not in the response you provided */}
-                            {/* If your API returns these, you would access them like: */}
+                            {/* If your API returns these, uncomment and adjust accordingly */}
                             {/* <TextField */}
                             {/* label="Created On" */}
                             {/* value={userData.user.created_at ? new Date(userData.user.created_at).toLocaleString() : 'N/A'} */}
@@ -152,9 +169,8 @@ const Profile = () => {
                     </Button>
                 </Paper>
             </Container>
-            <br></br>
-            <Footer/>
-        </>
+            <Footer sx={{ mt: 'auto' }} /> {/* mt: 'auto' will push the footer to the bottom */}
+        </Box>
     );
 };
 

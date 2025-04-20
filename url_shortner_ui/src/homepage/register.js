@@ -26,6 +26,7 @@ function MainLayout({ children }) {
         </Box>
     );
 }
+const API_BASE_URL = 'http://localhost:3000'; // Or get from environment variables
 
 const RegistrationForm = () => {
     const [formData, setFormData] = useState({
@@ -36,16 +37,38 @@ const RegistrationForm = () => {
     });
     const [responseMessage, setResponseMessage] = useState("");
     const [error, setError] = useState(false);
+    const [emailError, setEmailError] = useState("");
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
+        // Clear any previous response message when the user types
+        setResponseMessage("");
+        setError(false);
+        // If the email field changes, reset the email error
+        if (name === 'email') {
+            setEmailError("");
+        }
+    };
+
+    const validateEmail = (email) => {
+        // Basic email validation regex
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!validateEmail(formData.email)) {
+            setEmailError("Invalid email format.");
+            return;
+        } else {
+            setEmailError("");
+        }
+
         try {
-            const res = await fetch("http://http://http://localhost:3000//api/auth/register", { // Changed endpoint to /api/auth/register
+            const res = await fetch(`${API_BASE_URL}/api/auth/register`, { // Corrected endpoint
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -56,9 +79,11 @@ const RegistrationForm = () => {
             const result = await res.json();
 
             if (res.ok) {
-                setResponseMessage("Registration successful!");
+                setResponseMessage(result.message || "Registration successful! Please check your email to verify your account."); // Assuming backend sends a 'message' on success
                 setError(false);
                 console.log("Success:", result);
+                // Optionally clear the form after successful registration
+                setFormData({ username: "", password: "", email: "", fullName: "" });
             } else {
                 setResponseMessage(result.error || "Registration failed."); // Assuming backend sends an 'error' field on failure
                 setError(true);
@@ -68,6 +93,16 @@ const RegistrationForm = () => {
             setError(true);
             console.error("Error:", err);
         }
+    };
+
+    const isFormValid = () => {
+        return (
+            formData.username &&
+            formData.password &&
+            formData.email &&
+            formData.fullName &&
+            !emailError
+        );
     };
 
     return (
@@ -99,6 +134,8 @@ const RegistrationForm = () => {
                             name="email"
                             value={formData.email}
                             onChange={handleChange}
+                            error={!!emailError}
+                            helperText={emailError}
                         />
                         <TextField
                             margin="normal"
@@ -126,6 +163,7 @@ const RegistrationForm = () => {
                             fullWidth
                             variant="contained"
                             sx={{ mt: 3, mb: 2 }}
+                            disabled={!isFormValid()}
                         >
                             Register
                         </Button>

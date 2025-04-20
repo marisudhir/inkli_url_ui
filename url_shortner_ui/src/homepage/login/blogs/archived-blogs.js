@@ -14,9 +14,26 @@ import {
 } from '@mui/material';
 import { red } from '@mui/material/colors';
 import { useNavigate } from 'react-router-dom';
-import LoginHeader from './loginheader';
+import LoginHeader from '../loginheader';
 import { styled } from '@mui/material/styles';
-import no_data from './blogs/default/no_data.svg';
+import no_data from '../blogs/default/no_data.svg';
+const ImageBox = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  height: '100%',
+}));
+const StyledImage = styled('img')(({ theme }) => ({
+  width: '100%',
+  maxWidth: '600px',
+  height: 'auto',
+  [theme.breakpoints.down('md')]: {
+    maxWidth: '80%',
+  },
+  [theme.breakpoints.down('sm')]: {
+    maxWidth: '100%',
+  },
+}));
 // Styled Components
 const BlogCard = styled(CardContent)(({ theme }) => ({
   boxShadow: theme.shadows[3],
@@ -39,23 +56,6 @@ const BlogCardHeader = styled(CardHeader)(({ theme }) => ({
   },
 }));
 
-const ImageBox = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  height: '100%',
-}));
-const StyledImage = styled('img')(({ theme }) => ({
-  width: '100%',
-  maxWidth: '600px',
-  height: 'auto',
-  [theme.breakpoints.down('md')]: {
-    maxWidth: '80%',
-  },
-  [theme.breakpoints.down('sm')]: {
-    maxWidth: '100%',
-  },
-}));
 const BlogCardContent = styled(Box)(({ theme }) => ({
   padding: theme.spacing(2),
   '& .MuiTypography-body2': {
@@ -72,7 +72,7 @@ const BlogCardActions = styled(CardActions)(({ theme }) => ({
   justifyContent: 'flex-end',
 }));
 
-const YourBlogs = () => {
+const ArchivedBlogs = () => {
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -99,7 +99,7 @@ const YourBlogs = () => {
         return;
       }
 
-      const response = await axios.get('http://localhost:3000/api/blogs/me', {
+      const response = await axios.get('http://localhost:3000/api/blogs/archived-blogs', {
         headers: { Authorization: `Bearer ${rawToken}` },
       });
 
@@ -141,7 +141,7 @@ const YourBlogs = () => {
       const token = localStorage.getItem('authToken');
       if (!token) return;
 
-      await axios.patch(`http://localhost:3000/api/blogs/archive/${id}`, null, {
+      await axios.patch(`http://localhost:3000/api/blogs/unarchive/${id}`, null, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -160,7 +160,7 @@ const YourBlogs = () => {
     <>
       <LoginHeader />
       <Box p={4}>
-        <Typography variant="h4" gutterBottom style={{textAlign:'center'}}>Your Blogs</Typography>
+        <Typography variant="h4" gutterBottom>Archived Blogs</Typography>
 
         {loading ? (
           <Box display="flex" justifyContent="center" alignItems="center" minHeight="30vh">
@@ -172,12 +172,11 @@ const YourBlogs = () => {
           </Box>
         ) : blogs.length === 0 ? (<>
           <ImageBox>
-          <StyledImage src={no_data} alt="No Data Illustration" />
-        </ImageBox>
-        <Typography style={{textAlign:'center'}}>You haven't created any blogs yet.</Typography>
-
-        </>
-         ) : (
+                    <StyledImage src={no_data} alt="No Data Illustration" />
+                  </ImageBox>
+          <Typography>You haven't created any blogs yet.</Typography> 
+          </>     
+        ) : (
           <Box
             sx={{
               display: 'grid',
@@ -232,7 +231,7 @@ const YourBlogs = () => {
                     color="info"
                     onClick={() => handleArchive(post.id)}
                   >
-                    Archive
+                    Publish
                   </Button>
                 </BlogCardActions>
               </BlogCard>
@@ -244,4 +243,4 @@ const YourBlogs = () => {
   );
 };
 
-export default YourBlogs;
+export default ArchivedBlogs;

@@ -18,7 +18,7 @@ function CreateBlogs() {
 
   const navigate = useNavigate();
   const token = localStorage.getItem('authToken'); 
-  const geminiApiKey = process.env.REACT_APP_GEMINI_API_KEY;
+  const geminiApiKey = 'AIzaSyD--0KBT8ljqO_mjKeP-MSGQlXxB3ts2Nc';
   const maxAiUses = 5;
 
   const handleCreatePost = async () => {

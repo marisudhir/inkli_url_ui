@@ -1,43 +1,84 @@
 /* NavbarStyles.css */
+
+/* General Button Styles (for consistency) */
+.account-button {
+  display: inline-block;
+  border: none;
+  border-radius: 5px;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color 0.3s ease,
+    box-shadow 0.3s ease;
+  font-size: 0.9em;
+  padding: 8px 16px;
+  text-align: center;
+  margin: 2px;
+}
+
+.account-button:hover {
+  box-shadow: 0 0 10px rgba(0, 123, 255, 0.7);
+}
+
+.account-button:focus {
+  outline: none;
+  box-shadow: 0 0 10px rgba(0, 123, 255, 0.7);
+}
+
+/* Specific Styles for "Create Account" */
 .create-account-button {
-    display: inline-block; /* Make it behave like a block-level element but inline */
-    background-color: #007bff; /* Example button background color */
-    color: white; /* Example button text color */
-    border: none; /* Remove default link border */
-    border-radius: 5px; /* Add rounded corners */
-    text-decoration: none; /* Remove default link underline */
-    cursor: pointer; /* Change cursor to indicate it's clickable */
-    
-    transition: box-shadow 0.3s ease; /* Add transition for smooth glow effect */
-    font-size: 0.9em;
+  background-color: #007bff;
+  color: white;
+}
+
+.create-account-button:hover {
+  background-color: #0056b3;
+}
+
+/* Specific Styles for "Login" */
+.login-account-button {
+  background-color: #156c03;
+  color: white;
+  border-radius: 5px;
+}
+
+.login-account-button:hover {
+  background-color: #0e4a01;
+}
+
+/* Container for Buttons */
+.button-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  /* justify-content: center; */
+  flex-wrap: wrap; /* Allow buttons to wrap to the next line on small screens */
+}
+
+/* Media query for small screens (e.g., mobile phones) */
+@media screen and (max-width: 992px) {
+  .button-container {
+    flex-direction: column; /* Stack buttons vertically on small screens */
+    gap: 10px;
+    padding: 10px;
+    align-items: stretch; /* Make buttons stretch to container width */
   }
 
-  .create-account-button:hover {
-    box-shadow: 0 0 10px rgba(0, 123, 255, 0.7); /* Add a subtle glow on hover */
-  }
-  
-  .create-account-button:focus {
-    outline: none; /* Remove default focus outline for a custom one if needed */
-    box-shadow: 0 0 10px rgba(0, 123, 255, 0.7); /* Apply glow on focus as well */
+  .account-button {
+    width: 100%; /* Make buttons take full width on small screens */
+    margin: 2px 0; /* Adjust margin for stacked layout */
   }
 
   .login-account-button {
-    display: inline-block; /* Make it behave like a block-level element but inline */
-    background-color: #156c03; /* Example button background color */
-    color: white; /* Example button text color */
-    border: none; /* Remove default link border */
-    border-radius: 5px; /* Add rounded corners */
-    text-decoration: none; /* Remove default link underline */
-    cursor: pointer; /* Change cursor to indicate it's clickable */
-    
-    transition: box-shadow 0.3s ease; /* Add transition for smooth glow effect */
-    font-size: 0.9em;
+    background-color: #156c03;
+    color: white;
+    padding: 8px;
+    margin-top:5px;
   }
-  .login-account-button:hover {
-    box-shadow: 0 0 10px rgba(31, 188, 0, 0.808); /* Add a subtle glow on hover */
+  .create-account-button {
+    background-color: #007bff;
+    color: white;
+    padding:8px;
+    margin-top:5px
   }
-  
-  .login-account-button:focus {
-    outline: none; /* Remove default focus outline for a custom one if needed */
-    box-shadow: 0 0 10px rgba(0, 123, 255, 0.7); /* Apply glow on focus as well */
-  }
+}

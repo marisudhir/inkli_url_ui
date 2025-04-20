@@ -14,6 +14,8 @@ import FullBlogPost from './homepage/login/blogs/FullyBlogPost';
 import Settings from './homepage/login/settings';
 import YourBlogs from './homepage/login/yourblogs';
 import EditBlog from './homepage/login/EditBlog';
+import ArchivedBlogs from './homepage/login/blogs/archived-blogs';
+import VerifyEmail from './homepage/login/verifyemail';
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('authToken'));
 
@@ -53,7 +55,10 @@ function App() {
                 <Route path="/blog/:id" element={<FullBlogPost />} /> {/* Route for the full blog post */}
                 <Route path="/settings" element={<Settings/>}/>
                 <Route path="/yourblog" element={<YourBlogs/>}/>
+                <Route path="archived-blogs" element={<ArchivedBlogs/>}/>
                 <Route path="/edit/:postId" element={<EditBlog />} />
+                <Route path="/verify-email" element={<VerifyEmail />} />
+
 
                 {/* Protected Routes */}
                 <Route
