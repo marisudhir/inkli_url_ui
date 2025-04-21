@@ -45,7 +45,8 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
     padding: theme.spacing(3),
     marginBottom: theme.spacing(3),
 }));
-
+const BASE_URL=process.env.REACT_APP_BASE_URL;
+const BASE_URL_PLAIN=process.env.REACT_APP_BASE_URL_PLAIN;
 const modalStyle = {
     position: 'absolute',
     top: '50%',
@@ -257,7 +258,7 @@ const Dashboard = () => {
         }
 
         try {
-            const response = await fetch('http://localhost:3000/api/dashboard', {
+            const response = await fetch(`${BASE_URL}/dashboard`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 },
@@ -311,7 +312,7 @@ const Dashboard = () => {
     const handleViewAnalytics = async (shortUrlId) => {
         const token = localStorage.getItem('authToken');
         try {
-            const response = await fetch(`http://localhost:3000/api/urls/analytics/${shortUrlId}`, {
+            const response = await fetch(`${BASE_URL}/urls/analytics/${shortUrlId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 },
@@ -469,14 +470,14 @@ const Dashboard = () => {
                                 {visibleRows.map((url) => (
                                     <TableRow key={url.id}>
                                         <TableCell>{url.original_url}</TableCell>
-                                        <TableCell>{`http://localhost:3000/${url.short_url}`}</TableCell>
+                                        <TableCell>{`${BASE_URL_PLAIN}${url.short_url}`}</TableCell>
                                         <TableCell align="right">{new Date(url.created_at).toLocaleDateString()}</TableCell>
                                         {/* <TableCell align="right">{url.clicks || 0}</TableCell> */}
                                         <TableCell>
                                             <Button size="small" onClick={() => handleViewAnalytics(url.short_url)}> {/* Use short_url as ID */}
                                                 View Analytics
                                             </Button>
-                                            <Button size="small" onClick={() => navigator.clipboard.writeText(`http://localhost:3000/${url.short_url}`)}>
+                                            <Button size="small" onClick={() => navigator.clipboard.writeText(`${BASE_URL_PLAIN}${url.short_url}`)}>
                                                 Copy
                                             </Button>
                                         </TableCell>

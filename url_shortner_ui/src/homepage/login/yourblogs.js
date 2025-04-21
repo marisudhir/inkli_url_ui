@@ -38,7 +38,7 @@ const BlogCardHeader = styled(CardHeader)(({ theme }) => ({
     fontSize: '1rem',
   },
 }));
-
+const API_BASE_URL=process.env.REACT_APP_BASE_URL;
 const ImageBox = styled(Box)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'center',
@@ -99,7 +99,7 @@ const YourBlogs = () => {
         return;
       }
 
-      const response = await axios.get('http://localhost:3000/api/blogs/me', {
+      const response = await axios.get(`${API_BASE_URL}/blogs/me`, {
         headers: { Authorization: `Bearer ${rawToken}` },
       });
 
@@ -123,7 +123,7 @@ const YourBlogs = () => {
       const token = localStorage.getItem('authToken');
       if (!token) return;
 
-      await axios.delete(`http://localhost:3000/api/blogs/${id}`, {
+      await axios.delete(`${API_BASE_URL}/blogs/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -141,7 +141,7 @@ const YourBlogs = () => {
       const token = localStorage.getItem('authToken');
       if (!token) return;
 
-      await axios.patch(`http://localhost:3000/api/blogs/archive/${id}`, null, {
+      await axios.patch(`${API_BASE_URL}}blogs/archive/${id}`, null, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

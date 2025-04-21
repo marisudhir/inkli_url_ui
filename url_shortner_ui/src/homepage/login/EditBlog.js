@@ -12,14 +12,14 @@ const EditBlog = () => {
     const [content, setContent] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-
+    const BASE_URL=process.env.REACT_APP_BASE_URL;
     useEffect(() => {
         let isMounted = true; // to track if the component is still mounted
 
         const fetchBlog = async () => {
             try {
                 const token = localStorage.getItem('authToken');
-                const res = await axios.get(`http://localhost:3000/api/blogs/post/${postId}`, {
+                const res = await axios.get(`${BASE_URL}/blogs/post/${postId}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
 
@@ -52,7 +52,7 @@ const EditBlog = () => {
         try {
             const token = localStorage.getItem('authToken');
             await axios.put(
-                `http://localhost:3000/api/blogs/${postId}`,
+                `${BASE_URL}/blogs/${postId}`,
                 { title, content },
                 { headers: { Authorization: `Bearer ${token}` } }
             );

@@ -26,7 +26,7 @@ function MainLayout({ children }) {
         </Box>
     );
 }
-const API_BASE_URL = 'http://localhost:3000'; // Or get from environment variables
+const API_BASE_URL =  process.env.REACT_APP_BASE_URL; // Or get from environment variables
 
 const RegistrationForm = () => {
     const [formData, setFormData] = useState({
@@ -68,7 +68,7 @@ const RegistrationForm = () => {
         }
 
         try {
-            const res = await fetch(`${API_BASE_URL}/api/auth/register`, { // Corrected endpoint
+            const res = await fetch(`${API_BASE_URL}/auth/register`, { // Corrected endpoint
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

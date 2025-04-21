@@ -23,6 +23,9 @@ const ImageBox = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   height: '100%',
 }));
+
+const BEARER_TOKEN = process.env.REACT_APP_BEARER_TOKEN;
+const BASE_URL=process.env.REACT_APP_BASE_URL;
 const StyledImage = styled('img')(({ theme }) => ({
   width: '100%',
   maxWidth: '600px',
@@ -99,13 +102,16 @@ const ArchivedBlogs = () => {
         return;
       }
 
-      const response = await axios.get('http://localhost:3000/api/blogs/archived-blogs', {
+      const response = await axios.get(BEARER_TOKEN, {
+
         headers: { Authorization: `Bearer ${rawToken}` },
       });
 
       setBlogs(response.data);
     } catch (err) {
       console.error('Error fetching your blogs:', err);
+      console.log("Current API Endpoint in fetchBlogs:", process.env.REACT_APP_BEARER_TOKEN);
+
       setError('Failed to fetch your blogs. Please try again later.');
     } finally {
       setLoading(false);
@@ -123,7 +129,7 @@ const ArchivedBlogs = () => {
       const token = localStorage.getItem('authToken');
       if (!token) return;
 
-      await axios.delete(`http://localhost:3000/api/blogs/${id}`, {
+      await axios.delete(`${BASE_URL}/blogs/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -141,7 +147,7 @@ const ArchivedBlogs = () => {
       const token = localStorage.getItem('authToken');
       if (!token) return;
 
-      await axios.patch(`http://localhost:3000/api/blogs/unarchive/${id}`, null, {
+      await axios.patch(`${BASE_URL}blogs/unarchive/${id}`, null, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

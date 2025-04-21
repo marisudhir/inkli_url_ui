@@ -23,6 +23,7 @@ const Settings = () => {
     const [deactivateConfirmation, setDeactivateConfirmation] = useState(false);
     const [deactivateError, setDeactivateError] = useState('');
     const [deactivateSuccess, setDeactivateSuccess] = useState('');
+    const API_BASE_URL = process.env.REACT_APP_BASE_URL; // Or get from environment variables
 
     useEffect(() => {
         const token = localStorage.getItem('authToken');
@@ -56,7 +57,7 @@ const Settings = () => {
         const token = localStorage.getItem('authToken');
 
         try {
-            const response = await fetch('http://http://http://localhost:3000//api/user/profile/password', {
+            const response = await fetch(`${API_BASE_URL}/user/profile/password`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -98,7 +99,7 @@ const Settings = () => {
         const token = localStorage.getItem('authToken');
 
         try {
-            const response = await fetch('http://http://http://localhost:3000//api/user/profile/deactivate', {
+            const response = await fetch(`${API_BASE_URL}/user/profile/deactivate`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,

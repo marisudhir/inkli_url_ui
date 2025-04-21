@@ -9,13 +9,13 @@ const VerifyEmail = () => {
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
-    const API_BASE_URL = 'http://localhost:3000'; // Or get from environment variables
+    const API_BASE_URL = process.env.REACT_APP_BASE_URL; // Or get from environment variables
 
     useEffect(() => {
         if (token) {
             const verifyEmail = async () => {
                 try {
-                    const response = await fetch(`${API_BASE_URL}/api/auth/verify-email?token=${token}`);
+                    const response = await fetch(`${API_BASE_URL}/auth/verify-email?token=${token}`);
                     const data = await response.json();
 
                     if (response.ok) {

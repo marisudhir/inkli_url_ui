@@ -52,7 +52,7 @@ const Login = () => {
     const navigate = useNavigate();
 
     // Define API base URL
-    const API_BASE_URL = 'http://localhost:3000'; // Or get from environment variables
+    const API_BASE_URL = process.env.REACT_APP_BASE_URL; // Or get from environment variables
 
     const handleLogin = async (e) => {
         e.preventDefault(); // Prevent default form submission
@@ -67,7 +67,7 @@ const Login = () => {
         }
 
         try {
-            const response = await fetch(`${API_BASE_URL}/api/auth/login`, { // Use correct endpoint
+            const response = await fetch(`${API_BASE_URL}/auth/login`, { // Use correct endpoint
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

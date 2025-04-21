@@ -25,6 +25,7 @@ const CenteredSearchBox = styled(Box)(({ theme }) => ({
     justifyContent: 'center',
     marginBottom: theme.spacing(3),
 }));
+const BASE_URL=process.env.REACT_APP_BASE_URL;
 
 const SearchTextField = styled(TextField)(({ theme }) => ({
     '& .MuiOutlinedInput-root': {
@@ -104,7 +105,7 @@ function DisplayBlog() {
     // Fetch blog posts
     const fetchBlogPosts = async () => {
         try {
-            const response = await axios.get('http://localhost:3000/api/blogs/list');
+            const response = await axios.get(`${BASE_URL}/blogs/list`);
             setBlogPosts(response.data);
         } catch (err) {
             console.error('Error fetching blog posts:', err.message);

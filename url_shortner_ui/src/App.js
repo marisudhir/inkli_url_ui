@@ -16,6 +16,7 @@ import YourBlogs from './homepage/login/yourblogs';
 import EditBlog from './homepage/login/EditBlog';
 import ArchivedBlogs from './homepage/login/blogs/archived-blogs';
 import VerifyEmail from './homepage/login/verifyemail';
+import UnsubscribePage from './unsubscribe';
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('authToken'));
 
@@ -58,6 +59,7 @@ function App() {
                 <Route path="archived-blogs" element={<ArchivedBlogs/>}/>
                 <Route path="/edit/:postId" element={<EditBlog />} />
                 <Route path="/verify-email" element={<VerifyEmail />} />
+                <Route path="/unsubscribe" element={<UnsubscribePage />} />
 
 
                 {/* Protected Routes */}

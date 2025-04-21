@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import LoginHeader from '../loginheader';
 import TextEditor from './texteditor';
+import { Snackbar, Alert } from '@mui/material';
 
 function CreateBlogs() {
   const [title, setTitle] = useState('');
@@ -15,27 +16,44 @@ function CreateBlogs() {
   const [showUpgradePopup, setShowUpgradePopup] = useState(false);
   const [refresh, setRefresh] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
   const navigate = useNavigate();
-  const token = localStorage.getItem('authToken'); 
-  const geminiApiKey = 'AIzaSyD--0KBT8ljqO_mjKeP-MSGQlXxB3ts2Nc';
+  const token = localStorage.getItem('authToken');
+  const geminiApiKey = process.env.REACT_APP_GEMINI_API_KEY;
+  const BASE_URL = process.env.REACT_APP_BASE_URL;
   const maxAiUses = 5;
+
+  const showSnackbar = (message, severity) => {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setSnackbarOpen(true);
+  };
+
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSnackbarOpen(false);
+  };
 
   const handleCreatePost = async () => {
     if (!token) {
-      alert('You must be logged in to create a blog post.');
+      showSnackbar('You must be logged in to create a blog post.', 'error');
       navigate('/login');
       return;
     }
 
     if (!title.trim() || !content.trim()) {
-      alert('Both title and content are required.');
+      showSnackbar('Both title and content are required.', 'error');
       return;
     }
 
     try {
       const response = await axios.post(
-        'http://localhost:3000/api/blogs/create',
+        `${BASE_URL}/blogs/create`,
         { title, content },
         {
           headers: {
@@ -45,8 +63,6 @@ function CreateBlogs() {
         }
       );
 
-      console.log('Blog post created:', response.data);
-
       setTitle('');
       setContent('');
       setPrompt('');
@@ -54,11 +70,11 @@ function CreateBlogs() {
       setAiUses(0);
       localStorage.setItem('aiUses', '0');
 
-      alert('Blog post created successfully!');
+      showSnackbar('Blog post created successfully!', 'success');
     } catch (error) {
       const errMsg = error.response?.data?.error || error.message;
       console.error('Error creating blog post:', errMsg);
-      alert(`Failed to create blog post: ${errMsg}`);
+      showSnackbar(`Failed to create blog post: ${errMsg}`, 'error');
     }
   };
 
@@ -69,7 +85,7 @@ function CreateBlogs() {
     }
 
     if (!prompt.trim()) {
-      alert('Please enter a prompt to generate content.');
+      showSnackbar('Please enter a prompt to generate content.', 'error');
       return;
     }
 
@@ -98,7 +114,7 @@ function CreateBlogs() {
       });
     } catch (error) {
       console.error('Error generating content:', error);
-      alert('Failed to generate content.');
+      showSnackbar('Failed to generate content.', 'error');
     } finally {
       setLoading(false);
     }
@@ -275,6 +291,17 @@ function CreateBlogs() {
           </div>
         </div>
       )}
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
 
       {/* Spinner styles */}
       <style>
