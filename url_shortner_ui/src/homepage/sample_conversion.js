@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react"; // Added useEffect
+import React, { useState, useRef, useEffect } from "react";
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import TextField from '@mui/material/TextField';
@@ -9,9 +9,14 @@ import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import LoginIcon from '@mui/icons-material/Login'; // Import LoginIcon
+import LoginIcon from '@mui/icons-material/Login';
+import QrCodeIcon from '@mui/icons-material/QrCode'; // Import QR Code Icon
 import { styled } from '@mui/material/styles';
-import { Box, Typography } from '@mui/material'; // Import Typography
+import { Box, Typography } from '@mui/material';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import { saveAs } from 'file-saver'; // Import file-saver
 
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -64,8 +69,8 @@ const StyledShortenedURL = styled(TextField)(({ theme }) => ({
 const StyledActionButtons = styled(Box)(({ theme }) => ({
     display: 'flex',
     gap: theme.spacing(1),
-    marginTop: theme.spacing(1), // Reduced margin slightly
-    flexWrap: 'wrap', // Allow buttons to wrap on small screens
+    marginTop: theme.spacing(1),
+    flexWrap: 'wrap',
     width: '100%',
 }));
 // --- End Styled Components ---
@@ -74,27 +79,25 @@ const StyledActionButtons = styled(Box)(({ theme }) => ({
 function ShortURLSample() {
     const [longUrl, setLongUrl] = useState("");
     const [shortUrl, setShortUrl] = useState("");
-    // Client-side count is mainly for UX feedback, backend enforces the real limit
     const [anonShortenedCount, setAnonShortenedCount] = useState(0);
-    const [isLoading, setIsLoading] = useState(false); // Add loading state
-
-    // Snackbar states
+    const [isLoading, setIsLoading] = useState(false);
     const [limitSnackbarOpen, setLimitSnackbarOpen] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [errorSnackbarOpen, setErrorSnackbarOpen] = useState(false);
     const [infoSnackbarOpen, setInfoSnackbarOpen] = useState(false);
     const [infoMessage, setInfoMessage] = useState("");
     const [copySnackbarOpen, setCopySnackbarOpen] = useState(false);
+    const [qrCodeDialogOpen, setQrCodeDialogOpen] = useState(false); // State for QR dialog
+    const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');  // State to store the QR code data URL
 
     const shortenedUrlRef = useRef(null);
-    // const API_BASE_URL = "http://localhost:3000"; // Define base URL
-    const API_BASE_URL =  process.env.REACT_APP_BASE_URL; // Define base URL
-    // --- Load anonymous count from local storage on mount ---
+    const API_BASE_URL = process.env.REACT_APP_BASE_URL;
+    const API_BASE_URL_PLAIN = process.env.REACT_APP_BASE_URL_PLAIN;
+
     useEffect(() => {
         const storedCount = localStorage.getItem('anonymousUrlCount');
         setAnonShortenedCount(storedCount ? parseInt(storedCount, 10) : 0);
     }, []);
-
 
     const handleCloseSnackbar = (event, reason) => {
         if (reason === 'clickaway') {
@@ -107,7 +110,6 @@ function ShortURLSample() {
     };
 
     const handleShortenUrl = async () => {
-        // --- Preliminary Client-Side Checks ---
         if (anonShortenedCount >= 5) {
             setLimitSnackbarOpen(true);
             return;
@@ -119,7 +121,7 @@ function ShortURLSample() {
             return;
         }
         try {
-            new URL(longUrl); // Basic URL format validation
+            new URL(longUrl);
             if (!longUrl.startsWith('http://') && !longUrl.startsWith('https://')) {
                 throw new Error('Invalid protocol');
             }
@@ -129,20 +131,16 @@ function ShortURLSample() {
             return;
         }
 
-
-        setIsLoading(true); // Start loading indicator
-        setShortUrl(""); // Clear previous short URL
-        setErrorSnackbarOpen(false); // Clear previous errors
+        setIsLoading(true);
+        setShortUrl("");
+        setErrorSnackbarOpen(false);
         setInfoSnackbarOpen(false);
 
-        // --- API Endpoint for Anonymous Users ---
-        const apiUrl = `${API_BASE_URL}/api/public/shorten`;
-
+        const apiUrl = `${API_BASE_URL}/public/shorten`;
         const headers = {
             "Content-Type": "application/json",
         };
 
-        // --- Make API Call ---
         try {
             const response = await fetch(apiUrl, {
                 method: "POST",
@@ -150,14 +148,13 @@ function ShortURLSample() {
                 body: JSON.stringify({ url: longUrl }),
             });
 
-            const data = await response.json(); // Try to parse JSON regardless of status
+            const data = await response.json();
 
-            if (response.ok) { // Status 200-299
+            if (response.ok) {
                 setShortUrl(data.shortUrl);
                 setInfoMessage(data.message || "URL shortened successfully!");
                 setInfoSnackbarOpen(true);
 
-                // Increment anonymous count and store it
                 const newCount = anonShortenedCount + 1;
                 setAnonShortenedCount(newCount);
                 localStorage.setItem('anonymousUrlCount', newCount.toString());
@@ -165,12 +162,11 @@ function ShortURLSample() {
                     setLimitSnackbarOpen(true);
                 }
 
-            } else if (response.status === 429) { // Backend limit reached
+            } else if (response.status === 429) {
                 setErrorMessage(data.error || "You have reached the anonymous URL creation limit. Please create an account.");
                 setErrorSnackbarOpen(true);
             }
-             else {
-                // Handle other error statuses
+            else {
                 setErrorMessage(data.error || `Request failed with status ${response.status}`);
                 setErrorSnackbarOpen(true);
             }
@@ -179,14 +175,13 @@ function ShortURLSample() {
             setErrorMessage("Failed to connect to the server. Please check your connection and try again.");
             setErrorSnackbarOpen(true);
         } finally {
-            setIsLoading(false); // Stop loading indicator
+            setIsLoading(false);
         }
     };
 
-    // --- Action Handlers (Copy, Open, Refresh) ---
     const handleCopyClick = () => {
         if (shortUrl) {
-            const fullShortUrl = `${API_BASE_URL}/${shortUrl}`; // Use base URL
+            const fullShortUrl = `${API_BASE_URL_PLAIN}/${shortUrl}`;
             navigator.clipboard.writeText(fullShortUrl)
                 .then(() => {
                     setCopySnackbarOpen(true);
@@ -208,17 +203,90 @@ function ShortURLSample() {
     const handleRefreshClick = () => {
         setLongUrl("");
         setShortUrl("");
-        setErrorSnackbarOpen(false); // Clear errors on refresh
+        setErrorSnackbarOpen(false);
         setInfoSnackbarOpen(false);
+    };
+
+    // --- QR Code Handlers ---
+    const handleGenerateQrCode = async () => {
+        if (!shortUrl) return;
+
+        setIsLoading(true);
+        const qrCodeUrl = `${API_BASE_URL}/qrcode?url=${encodeURIComponent(`${API_BASE_URL_PLAIN}/${shortUrl}`)}`; // Corrected URL
+
+        try {
+            const response = await fetch(qrCodeUrl);
+            const data = await response.json();
+            if(response.ok){
+              setQrCodeDataUrl(data.qrCode);
+              setQrCodeDialogOpen(true);
+            }
+            else{
+              setErrorMessage("Failed to generate QR Code");
+              setErrorSnackbarOpen(true);
+            }
+
+        } catch (error) {
+            console.error("QR Code Fetch Error:", error);
+            setErrorMessage("Failed to generate QR code. Please check your connection.");
+            setErrorSnackbarOpen(true);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleCloseQrCodeDialog = () => {
+        setQrCodeDialogOpen(false);
+        setQrCodeDataUrl('');
+    };
+
+    const handleDownloadQrCode = () => {
+        if (qrCodeDataUrl) {
+            // Extract the base64 data
+            const base64Data = qrCodeDataUrl.split(',')[1];
+            // Decode base64
+            const byteCharacters = atob(base64Data);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            // Create a Blob
+            const blob = new Blob([byteArray], { type: 'image/png' }); // Or 'image/jpeg', etc.
+            // Use file-saver to download
+            saveAs(blob, `shorturl_qrcode_${shortUrl}.png`);
+        }
+    };
+
+    const handleCopyQrCode = () => {
+        if (qrCodeDataUrl) {
+            // Convert base64 to a Blob (required for clipboard)
+              const base64Data = qrCodeDataUrl.split(',')[1];
+              const byteCharacters = atob(base64Data);
+              const byteNumbers = new Array(byteCharacters.length);
+              for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+              }
+              const byteArray = new Uint8Array(byteNumbers);
+              const blob = new Blob([byteArray], { type: 'image/png' });
+            // Use the Clipboard API to copy the image
+            const data = [new ClipboardItem({
+                'image/png': blob
+            })];
+            navigator.clipboard.write(data).then(() => {
+                setCopySnackbarOpen(true);
+            }).catch(err => {
+                console.error('Failed to copy image: ', err);
+                setErrorMessage('Failed to copy QR code image.');
+                setErrorSnackbarOpen(true);
+            });
+        }
     };
 
     // --- Render Component ---
     return (
         <>
             <StyledContainer>
-                {/* Optional: Add a title */}
-
-
                 <StyledTextField
                     fullWidth
                     id="long-url-input"
@@ -232,18 +300,16 @@ function ShortURLSample() {
                     onClick={handleShortenUrl}
                     variant="contained"
                     startIcon={<AutoAwesomeIcon />}
-                    disabled={isLoading || anonShortenedCount >= 5} // Disable if loading or anon limit reached
+                    disabled={isLoading || anonShortenedCount >= 5}
                 >
                     {isLoading ? "Shortening..." : "Shorten URL"}
                 </StyledButton>
 
-                {/* Display message if anonymous limit is reached */}
                 {anonShortenedCount >= 5 && (
                     <Typography color="error" variant="caption">
-                        Anonymous limit reached. <Button size="small" onClick={() => {/* Navigate to your registration page */ window.location.href = '/register'; }}>Create Account</Button> to create unlimited links.
+                        Anonymous limit reached. <Button size="small" onClick={() => { window.location.href = '/register'; }}>Create Account</Button> to create unlimited links.
                     </Typography>
                 )}
-
 
                 {shortUrl && (
                     <StyledShortenedURLContainer>
@@ -251,7 +317,7 @@ function ShortURLSample() {
                         <StyledShortenedURL
                             label="Shortened URL"
                             id="short-url-output"
-                            value={`${API_BASE_URL}/${shortUrl}`} // Display full URL
+                            value={`${API_BASE_URL}/${shortUrl}`}
                             InputProps={{
                                 startAdornment: (
                                     <InputAdornment position="start">
@@ -262,12 +328,11 @@ function ShortURLSample() {
                             }}
                             variant="outlined"
                             inputRef={shortenedUrlRef}
-                            // Removed onClick to open, use dedicated button instead
                         />
                         <StyledActionButtons>
                             <Button
                                 variant="outlined"
-                                size="small" // Make buttons smaller
+                                size="small"
                                 startIcon={<ContentCopyIcon />}
                                 onClick={handleCopyClick}
                                 disabled={isLoading}
@@ -291,6 +356,15 @@ function ShortURLSample() {
                                 disabled={isLoading}
                             >
                                 New URL
+                            </Button>
+                            <Button
+                                variant="outlined"
+                                size="small"
+                                startIcon={<QrCodeIcon />}
+                                onClick={handleGenerateQrCode}
+                                disabled={isLoading}
+                            >
+                                QR Code
                             </Button>
                         </StyledActionButtons>
                     </StyledShortenedURLContainer>
@@ -321,6 +395,27 @@ function ShortURLSample() {
                     Link copied to clipboard!
                 </Alert>
             </Snackbar>
+
+            {/* --- QR Code Dialog --- */}
+            <Dialog open={qrCodeDialogOpen} onClose={handleCloseQrCodeDialog}>
+                <DialogTitle>QR Code for Shortened URL</DialogTitle>
+                <DialogContent>
+                    {qrCodeDataUrl && (
+                        <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
+                            <img src={qrCodeDataUrl} alt="QR Code" style={{ maxWidth: '300px', maxHeight: '300px' }} />
+                            <StyledActionButtons>
+                                <Button variant="contained" onClick={handleCopyQrCode} disabled={isLoading}>
+                                    Copy QR Code
+                                </Button>
+                                <Button variant="contained" onClick={handleDownloadQrCode} disabled={isLoading}>
+                                    Download QR Code
+                                </Button>
+                            </StyledActionButtons>
+                        </Box>
+
+                    )}
+                </DialogContent>
+            </Dialog>
         </>
     );
 }

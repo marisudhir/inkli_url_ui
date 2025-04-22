@@ -19,6 +19,7 @@
     "bootstrap": "^5.3.5",
     "date-fns": "^4.1.0",
     "dotenv": "^16.5.0",
+    "file-saver": "^2.0.5",
     "font-awesome": "^4.7.0",
     "froala-editor": "^4.5.1",
     "jwt-decode": "^4.0.0",

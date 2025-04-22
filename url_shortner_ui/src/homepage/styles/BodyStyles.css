@@ -165,7 +165,7 @@
   }
 
   .stats-circles-container {
-    flex-direction: column; /* Stack circles on mobile */
+    flex-wrap: wrap; /* Stack circles on mobile */
     align-items: center;
     padding: 20px;
     margin-top: 5%;

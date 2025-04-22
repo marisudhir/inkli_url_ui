@@ -149,12 +149,12 @@ function FullBlogPost() {
                             </Box>
                         )}
 
-                        <Box sx={{ mt: 4 }}>
+                        {/* <Box sx={{ mt: 4 }}>
                             <Typography variant="h6" gutterBottom>Enjoyed this article?</Typography>
                             <Button variant="contained" color="primary" onClick={handleOpenModal}>
                                 Subscribe for more!
                             </Button>
-                        </Box>
+                        </Box> */}
                     </Card>
 
                     {relatedPosts.length > 0 && (
